@@ -1,0 +1,694 @@
+﻿<?xml version="1.0" encoding="utf-8"?>
+<edmx:Edmx Version="3.0" xmlns:edmx="http://schemas.microsoft.com/ado/2009/11/edmx">
+  <!-- EF Runtime content -->
+  <edmx:Runtime>
+    <!-- SSDL content -->
+    <edmx:StorageModels>
+      <Schema Namespace="EFModel.Store" Provider="System.Data.SqlClient" ProviderManifestToken="2008" Alias="Self" xmlns:store="http://schemas.microsoft.com/ado/2007/12/edm/EntityStoreSchemaGenerator" xmlns:customannotation="http://schemas.microsoft.com/ado/2013/11/edm/customannotation" xmlns="http://schemas.microsoft.com/ado/2009/11/edm/ssdl">
+        <EntityType Name="change_log">
+          <Key>
+            <PropertyRef Name="id" />
+          </Key>
+          <Property Name="id" Type="int" StoreGeneratedPattern="Identity" Nullable="false" />
+          <Property Name="data_evento" Type="datetime" Nullable="false" />
+          <Property Name="evento" Type="varchar" MaxLength="256" Nullable="false" />
+          <Property Name="estado" Type="numeric" Precision="1" Scale="0" Nullable="false" />
+          <Property Name="ip" Type="varchar" MaxLength="48" Nullable="false" />
+          <Property Name="utilizador" Type="nchar" MaxLength="128" Nullable="false" />
+          <Property Name="factura_codigo" Type="varchar" MaxLength="12" />
+        </EntityType>
+        <EntityType Name="contribuinte">
+          <Key>
+            <PropertyRef Name="id" />
+          </Key>
+          <Property Name="id" Type="numeric" Precision="9" Scale="0" Nullable="false" />
+          <Property Name="nome" Type="varchar" MaxLength="20" />
+          <Property Name="morada" Type="varchar" MaxLength="256" />
+        </EntityType>
+        <EntityType Name="devolucao">
+          <Key>
+            <PropertyRef Name="item_numero" />
+            <PropertyRef Name="nota_credito_codigo" />
+          </Key>
+          <Property Name="quantidade" Type="numeric" Precision="10" Scale="0" Nullable="false" />
+          <Property Name="item_numero" Type="numeric" Precision="3" Scale="0" Nullable="false" />
+          <Property Name="factura_codigo" Type="varchar" MaxLength="12" Nullable="false" />
+          <Property Name="nota_credito_codigo" Type="varchar" MaxLength="12" Nullable="false" />
+        </EntityType>
+        <EntityType Name="factura">
+          <Key>
+            <PropertyRef Name="codigo" />
+          </Key>
+          <Property Name="codigo" Type="varchar" MaxLength="12" Nullable="false" />
+          <Property Name="estado" Type="numeric" Precision="1" Scale="0" Nullable="false" />
+          <Property Name="data_criacao" Type="datetime" Nullable="false" />
+          <Property Name="data_complecao" Type="datetime" />
+          <Property Name="preco" Type="decimal" Precision="7" Scale="2" />
+          <Property Name="iva" Type="decimal" Precision="7" Scale="2" />
+        </EntityType>
+        <EntityType Name="factura_contribuinte">
+          <Key>
+            <PropertyRef Name="factura_codigo" />
+          </Key>
+          <Property Name="factura_codigo" Type="varchar" MaxLength="12" Nullable="false" />
+          <Property Name="contribuinte_id" Type="numeric" Precision="9" Scale="0" />
+        </EntityType>
+        <EntityType Name="item">
+          <Key>
+            <PropertyRef Name="numero" />
+            <PropertyRef Name="factura_codigo" />
+          </Key>
+          <Property Name="numero" Type="numeric" Precision="3" Scale="0" Nullable="false" />
+          <Property Name="quantidade" Type="numeric" Precision="10" Scale="0" Nullable="false" />
+          <Property Name="desconto" Type="decimal" Precision="6" Scale="5" Nullable="false" />
+          <Property Name="descricao" Type="varchar" MaxLength="255" />
+          <Property Name="produto_sku" Type="int" />
+          <Property Name="factura_codigo" Type="varchar" MaxLength="12" Nullable="false" />
+        </EntityType>
+        <EntityType Name="nota_credito">
+          <Key>
+            <PropertyRef Name="codigo" />
+            <PropertyRef Name="factura_codigo" />
+          </Key>
+          <Property Name="codigo" Type="varchar" MaxLength="12" Nullable="false" />
+          <Property Name="estado" Type="numeric" Precision="1" Scale="0" Nullable="false" />
+          <Property Name="data_criacao" Type="datetime" Nullable="false" />
+          <Property Name="data_complecao" Type="datetime" />
+          <Property Name="factura_codigo" Type="varchar" MaxLength="12" Nullable="false" />
+          <Property Name="preco" Type="decimal" Precision="7" Scale="2" />
+          <Property Name="iva" Type="decimal" Precision="7" Scale="2" />
+        </EntityType>
+        <EntityType Name="produto">
+          <Key>
+            <PropertyRef Name="sku" />
+          </Key>
+          <Property Name="sku" Type="int" StoreGeneratedPattern="Identity" Nullable="false" />
+          <Property Name="preco" Type="decimal" Precision="7" Scale="2" Nullable="false" />
+          <Property Name="iva" Type="decimal" Precision="6" Scale="5" Nullable="false" />
+          <Property Name="descricao" Type="varchar" MaxLength="256" />
+        </EntityType>
+        <Association Name="FK__change_lo__factu__516845DB">
+          <End Role="factura" Type="Self.factura" Multiplicity="0..1" />
+          <End Role="change_log" Type="Self.change_log" Multiplicity="*" />
+          <ReferentialConstraint>
+            <Principal Role="factura">
+              <PropertyRef Name="codigo" />
+            </Principal>
+            <Dependent Role="change_log">
+              <PropertyRef Name="factura_codigo" />
+            </Dependent>
+          </ReferentialConstraint>
+        </Association>
+        <Association Name="FK__devolucao__48D2FFDA">
+          <End Role="item" Type="Self.item" Multiplicity="1" />
+          <End Role="devolucao" Type="Self.devolucao" Multiplicity="*" />
+          <ReferentialConstraint>
+            <Principal Role="item">
+              <PropertyRef Name="numero" />
+              <PropertyRef Name="factura_codigo" />
+            </Principal>
+            <Dependent Role="devolucao">
+              <PropertyRef Name="item_numero" />
+              <PropertyRef Name="factura_codigo" />
+            </Dependent>
+          </ReferentialConstraint>
+        </Association>
+        <Association Name="FK__devolucao__49C72413">
+          <End Role="nota_credito" Type="Self.nota_credito" Multiplicity="1" />
+          <End Role="devolucao" Type="Self.devolucao" Multiplicity="*" />
+          <ReferentialConstraint>
+            <Principal Role="nota_credito">
+              <PropertyRef Name="codigo" />
+              <PropertyRef Name="factura_codigo" />
+            </Principal>
+            <Dependent Role="devolucao">
+              <PropertyRef Name="nota_credito_codigo" />
+              <PropertyRef Name="factura_codigo" />
+            </Dependent>
+          </ReferentialConstraint>
+        </Association>
+        <Association Name="FK__factura_c__contr__30FB7649">
+          <End Role="contribuinte" Type="Self.contribuinte" Multiplicity="0..1" />
+          <End Role="factura_contribuinte" Type="Self.factura_contribuinte" Multiplicity="*" />
+          <ReferentialConstraint>
+            <Principal Role="contribuinte">
+              <PropertyRef Name="id" />
+            </Principal>
+            <Dependent Role="factura_contribuinte">
+              <PropertyRef Name="contribuinte_id" />
+            </Dependent>
+          </ReferentialConstraint>
+        </Association>
+        <Association Name="FK__factura_c__factu__30075210">
+          <End Role="factura" Type="Self.factura" Multiplicity="1" />
+          <End Role="factura_contribuinte" Type="Self.factura_contribuinte" Multiplicity="0..1" />
+          <ReferentialConstraint>
+            <Principal Role="factura">
+              <PropertyRef Name="codigo" />
+            </Principal>
+            <Dependent Role="factura_contribuinte">
+              <PropertyRef Name="factura_codigo" />
+            </Dependent>
+          </ReferentialConstraint>
+        </Association>
+        <Association Name="FK__item__factura_co__389C9811">
+          <End Role="factura" Type="Self.factura" Multiplicity="1" />
+          <End Role="item" Type="Self.item" Multiplicity="*" />
+          <ReferentialConstraint>
+            <Principal Role="factura">
+              <PropertyRef Name="codigo" />
+            </Principal>
+            <Dependent Role="item">
+              <PropertyRef Name="factura_codigo" />
+            </Dependent>
+          </ReferentialConstraint>
+        </Association>
+        <Association Name="FK__item__produto_sk__37A873D8">
+          <End Role="produto" Type="Self.produto" Multiplicity="0..1" />
+          <End Role="item" Type="Self.item" Multiplicity="*" />
+          <ReferentialConstraint>
+            <Principal Role="produto">
+              <PropertyRef Name="sku" />
+            </Principal>
+            <Dependent Role="item">
+              <PropertyRef Name="produto_sku" />
+            </Dependent>
+          </ReferentialConstraint>
+        </Association>
+        <Association Name="FK__nota_cred__factu__403DB9D9">
+          <End Role="factura" Type="Self.factura" Multiplicity="1" />
+          <End Role="nota_credito" Type="Self.nota_credito" Multiplicity="*" />
+          <ReferentialConstraint>
+            <Principal Role="factura">
+              <PropertyRef Name="codigo" />
+            </Principal>
+            <Dependent Role="nota_credito">
+              <PropertyRef Name="factura_codigo" />
+            </Dependent>
+          </ReferentialConstraint>
+        </Association>
+        <Function Name="f_listarNotasCredito" Aggregate="false" BuiltIn="false" NiladicFunction="false" IsComposable="true" ParameterTypeSemantics="AllowImplicitConversion" Schema="cliente">
+          <Parameter Name="ano" Type="int" Mode="In" />
+          <ReturnType>
+            <CollectionType>
+              <RowType>
+                <Property Name="NotaCredito" Type="varchar" MaxLength="12" Nullable="false" />
+                <Property Name="Factura" Type="varchar" MaxLength="12" Nullable="false" />
+                <Property Name="Estado" Type="numeric" Precision="1" Scale="0" Nullable="false" />
+                <Property Name="DataCriacao" Type="datetime" Nullable="false" />
+                <Property Name="DataComplecao" Type="datetime" />
+                <Property Name="Preco" Type="decimal" Precision="7" Scale="2" />
+                <Property Name="IVA" Type="decimal" Precision="7" Scale="2" />
+              </RowType>
+            </CollectionType>
+          </ReturnType>
+        </Function>
+        <Function Name="p_criaFactura" Aggregate="false" BuiltIn="false" NiladicFunction="false" IsComposable="false" ParameterTypeSemantics="AllowImplicitConversion" Schema="cliente">
+          <Parameter Name="contribuinte" Type="numeric" Mode="In" />
+          <Parameter Name="nome" Type="varchar" Mode="In" />
+          <Parameter Name="morada" Type="varchar" Mode="In" />
+          <Parameter Name="codigo" Type="varchar" Mode="InOut" />
+        </Function>
+        <Function Name="p_criaNotaCredito" Aggregate="false" BuiltIn="false" NiladicFunction="false" IsComposable="false" ParameterTypeSemantics="AllowImplicitConversion" Schema="cliente">
+          <Parameter Name="factura_codigo" Type="varchar" Mode="In" />
+          <Parameter Name="codigo" Type="varchar" Mode="InOut" />
+        </Function>
+        <Function Name="p_facturaAnular" Aggregate="false" BuiltIn="false" NiladicFunction="false" IsComposable="false" ParameterTypeSemantics="AllowImplicitConversion" Schema="cliente">
+          <Parameter Name="codigo" Type="varchar" Mode="In" />
+        </Function>
+        <Function Name="p_facturaEmitir" Aggregate="false" BuiltIn="false" NiladicFunction="false" IsComposable="false" ParameterTypeSemantics="AllowImplicitConversion" Schema="cliente">
+          <Parameter Name="codigo" Type="varchar" Mode="In" />
+        </Function>
+        <Function Name="p_facturaProforma" Aggregate="false" BuiltIn="false" NiladicFunction="false" IsComposable="false" ParameterTypeSemantics="AllowImplicitConversion" Schema="cliente">
+          <Parameter Name="codigo" Type="varchar" Mode="In" />
+        </Function>
+        <Function Name="p_notaCreditoEmitir" Aggregate="false" BuiltIn="false" NiladicFunction="false" IsComposable="false" ParameterTypeSemantics="AllowImplicitConversion" Schema="cliente">
+          <Parameter Name="codigo" Type="varchar" Mode="In" />
+        </Function>
+        <EntityContainer Name="EFModelStoreContainer">
+          <EntitySet Name="change_log" EntityType="Self.change_log" Schema="dbo" store:Type="Tables" />
+          <EntitySet Name="contribuinte" EntityType="Self.contribuinte" Schema="dbo" store:Type="Tables" />
+          <EntitySet Name="devolucao" EntityType="Self.devolucao" Schema="dbo" store:Type="Tables" />
+          <EntitySet Name="factura" EntityType="Self.factura" Schema="dbo" store:Type="Tables" />
+          <EntitySet Name="factura_contribuinte" EntityType="Self.factura_contribuinte" Schema="dbo" store:Type="Tables" />
+          <EntitySet Name="item" EntityType="Self.item" Schema="dbo" store:Type="Tables" />
+          <EntitySet Name="nota_credito" EntityType="Self.nota_credito" Schema="dbo" store:Type="Tables" />
+          <EntitySet Name="produto" EntityType="Self.produto" Schema="dbo" store:Type="Tables" />
+          <AssociationSet Name="FK__change_lo__factu__516845DB" Association="Self.FK__change_lo__factu__516845DB">
+            <End Role="factura" EntitySet="factura" />
+            <End Role="change_log" EntitySet="change_log" />
+          </AssociationSet>
+          <AssociationSet Name="FK__devolucao__48D2FFDA" Association="Self.FK__devolucao__48D2FFDA">
+            <End Role="item" EntitySet="item" />
+            <End Role="devolucao" EntitySet="devolucao" />
+          </AssociationSet>
+          <AssociationSet Name="FK__devolucao__49C72413" Association="Self.FK__devolucao__49C72413">
+            <End Role="nota_credito" EntitySet="nota_credito" />
+            <End Role="devolucao" EntitySet="devolucao" />
+          </AssociationSet>
+          <AssociationSet Name="FK__factura_c__contr__30FB7649" Association="Self.FK__factura_c__contr__30FB7649">
+            <End Role="contribuinte" EntitySet="contribuinte" />
+            <End Role="factura_contribuinte" EntitySet="factura_contribuinte" />
+          </AssociationSet>
+          <AssociationSet Name="FK__factura_c__factu__30075210" Association="Self.FK__factura_c__factu__30075210">
+            <End Role="factura" EntitySet="factura" />
+            <End Role="factura_contribuinte" EntitySet="factura_contribuinte" />
+          </AssociationSet>
+          <AssociationSet Name="FK__item__factura_co__389C9811" Association="Self.FK__item__factura_co__389C9811">
+            <End Role="factura" EntitySet="factura" />
+            <End Role="item" EntitySet="item" />
+          </AssociationSet>
+          <AssociationSet Name="FK__item__produto_sk__37A873D8" Association="Self.FK__item__produto_sk__37A873D8">
+            <End Role="produto" EntitySet="produto" />
+            <End Role="item" EntitySet="item" />
+          </AssociationSet>
+          <AssociationSet Name="FK__nota_cred__factu__403DB9D9" Association="Self.FK__nota_cred__factu__403DB9D9">
+            <End Role="factura" EntitySet="factura" />
+            <End Role="nota_credito" EntitySet="nota_credito" />
+          </AssociationSet>
+        </EntityContainer>
+      </Schema>
+    </edmx:StorageModels>
+    <!-- CSDL content -->
+    <edmx:ConceptualModels>
+      <Schema Namespace="EFModel" Alias="Self" annotation:UseStrongSpatialTypes="false" xmlns:annotation="http://schemas.microsoft.com/ado/2009/02/edm/annotation" xmlns:customannotation="http://schemas.microsoft.com/ado/2013/11/edm/customannotation" xmlns="http://schemas.microsoft.com/ado/2009/11/edm">
+        <ComplexType Name="f_listarNotasCredito_Result">
+          <Property Name="NotaCredito" Type="String" MaxLength="12" FixedLength="false" Unicode="false" Nullable="false" />
+          <Property Name="Factura" Type="String" MaxLength="12" FixedLength="false" Unicode="false" Nullable="false" />
+          <Property Name="Estado" Type="Decimal" Precision="1" Scale="0" Nullable="false" />
+          <Property Name="DataCriacao" Type="DateTime" Nullable="false" />
+          <Property Name="DataComplecao" Type="DateTime" />
+          <Property Name="Preco" Type="Decimal" Precision="7" Scale="2" />
+          <Property Name="IVA" Type="Decimal" Precision="7" Scale="2" />
+        </ComplexType>
+        <EntityType Name="change_log">
+          <Key>
+            <PropertyRef Name="id" />
+          </Key>
+          <Property Name="id" Type="Int32" Nullable="false" annotation:StoreGeneratedPattern="Identity" />
+          <Property Name="data_evento" Type="DateTime" Nullable="false" Precision="3" />
+          <Property Name="evento" Type="String" MaxLength="256" FixedLength="false" Unicode="false" Nullable="false" />
+          <Property Name="estado" Type="Decimal" Precision="1" Scale="0" Nullable="false" />
+          <Property Name="ip" Type="String" MaxLength="48" FixedLength="false" Unicode="false" Nullable="false" />
+          <Property Name="utilizador" Type="String" MaxLength="128" FixedLength="true" Unicode="true" Nullable="false" />
+          <Property Name="factura_codigo" Type="String" MaxLength="12" FixedLength="false" Unicode="false" />
+          <NavigationProperty Name="factura" Relationship="Self.FK__change_lo__factu__516845DB" FromRole="change_log" ToRole="factura" />
+        </EntityType>
+        <EntityType Name="contribuinte">
+          <Key>
+            <PropertyRef Name="id" />
+          </Key>
+          <Property Name="id" Type="Decimal" Precision="9" Scale="0" Nullable="false" />
+          <Property Name="nome" Type="String" MaxLength="20" FixedLength="false" Unicode="false" />
+          <Property Name="morada" Type="String" MaxLength="256" FixedLength="false" Unicode="false" />
+          <NavigationProperty Name="factura_contribuinte" Relationship="Self.FK__factura_c__contr__30FB7649" FromRole="contribuinte" ToRole="factura_contribuinte" />
+        </EntityType>
+        <EntityType Name="devolucao">
+          <Key>
+            <PropertyRef Name="item_numero" />
+            <PropertyRef Name="nota_credito_codigo" />
+          </Key>
+          <Property Name="quantidade" Type="Decimal" Precision="10" Scale="0" Nullable="false" />
+          <Property Name="item_numero" Type="Decimal" Precision="3" Scale="0" Nullable="false" />
+          <Property Name="factura_codigo" Type="String" MaxLength="12" FixedLength="false" Unicode="false" Nullable="false" />
+          <Property Name="nota_credito_codigo" Type="String" MaxLength="12" FixedLength="false" Unicode="false" Nullable="false" />
+          <NavigationProperty Name="item" Relationship="Self.FK__devolucao__48D2FFDA" FromRole="devolucao" ToRole="item" />
+          <NavigationProperty Name="nota_credito" Relationship="Self.FK__devolucao__49C72413" FromRole="devolucao" ToRole="nota_credito" />
+        </EntityType>
+        <EntityType Name="factura">
+          <Key>
+            <PropertyRef Name="codigo" />
+          </Key>
+          <Property Name="codigo" Type="String" MaxLength="12" FixedLength="false" Unicode="false" Nullable="false" />
+          <Property Name="estado" Type="Decimal" Precision="1" Scale="0" Nullable="false" />
+          <Property Name="data_criacao" Type="DateTime" Nullable="false" Precision="3" />
+          <Property Name="data_complecao" Type="DateTime" Precision="3" />
+          <Property Name="preco" Type="Decimal" Precision="7" Scale="2" />
+          <Property Name="iva" Type="Decimal" Precision="7" Scale="2" />
+          <NavigationProperty Name="change_log" Relationship="Self.FK__change_lo__factu__516845DB" FromRole="factura" ToRole="change_log" />
+          <NavigationProperty Name="factura_contribuinte" Relationship="Self.FK__factura_c__factu__30075210" FromRole="factura" ToRole="factura_contribuinte" />
+          <NavigationProperty Name="items" Relationship="Self.FK__item__factura_co__389C9811" FromRole="factura" ToRole="item" />
+          <NavigationProperty Name="nota_credito" Relationship="Self.FK__nota_cred__factu__403DB9D9" FromRole="factura" ToRole="nota_credito" />
+        </EntityType>
+        <EntityType Name="factura_contribuinte">
+          <Key>
+            <PropertyRef Name="factura_codigo" />
+          </Key>
+          <Property Name="factura_codigo" Type="String" MaxLength="12" FixedLength="false" Unicode="false" Nullable="false" />
+          <Property Name="contribuinte_id" Type="Decimal" Precision="9" Scale="0" />
+          <NavigationProperty Name="contribuinte" Relationship="Self.FK__factura_c__contr__30FB7649" FromRole="factura_contribuinte" ToRole="contribuinte" />
+          <NavigationProperty Name="factura" Relationship="Self.FK__factura_c__factu__30075210" FromRole="factura_contribuinte" ToRole="factura" />
+        </EntityType>
+        <EntityType Name="item">
+          <Key>
+            <PropertyRef Name="numero" />
+            <PropertyRef Name="factura_codigo" />
+          </Key>
+          <Property Name="numero" Type="Decimal" Precision="3" Scale="0" Nullable="false" />
+          <Property Name="quantidade" Type="Decimal" Precision="10" Scale="0" Nullable="false" />
+          <Property Name="desconto" Type="Decimal" Precision="6" Scale="5" Nullable="false" />
+          <Property Name="descricao" Type="String" MaxLength="255" FixedLength="false" Unicode="false" />
+          <Property Name="produto_sku" Type="Int32" />
+          <Property Name="factura_codigo" Type="String" MaxLength="12" FixedLength="false" Unicode="false" Nullable="false" />
+          <NavigationProperty Name="devolucaos" Relationship="Self.FK__devolucao__48D2FFDA" FromRole="item" ToRole="devolucao" />
+          <NavigationProperty Name="factura" Relationship="Self.FK__item__factura_co__389C9811" FromRole="item" ToRole="factura" />
+          <NavigationProperty Name="produto" Relationship="Self.FK__item__produto_sk__37A873D8" FromRole="item" ToRole="produto" />
+        </EntityType>
+        <EntityType Name="nota_credito">
+          <Key>
+            <PropertyRef Name="codigo" />
+            <PropertyRef Name="factura_codigo" />
+          </Key>
+          <Property Name="codigo" Type="String" MaxLength="12" FixedLength="false" Unicode="false" Nullable="false" />
+          <Property Name="estado" Type="Decimal" Precision="1" Scale="0" Nullable="false" />
+          <Property Name="data_criacao" Type="DateTime" Nullable="false" Precision="3" />
+          <Property Name="data_complecao" Type="DateTime" Precision="3" />
+          <Property Name="factura_codigo" Type="String" MaxLength="12" FixedLength="false" Unicode="false" Nullable="false" />
+          <Property Name="preco" Type="Decimal" Precision="7" Scale="2" />
+          <Property Name="iva" Type="Decimal" Precision="7" Scale="2" />
+          <NavigationProperty Name="devolucaos" Relationship="Self.FK__devolucao__49C72413" FromRole="nota_credito" ToRole="devolucao" />
+          <NavigationProperty Name="factura" Relationship="Self.FK__nota_cred__factu__403DB9D9" FromRole="nota_credito" ToRole="factura" />
+        </EntityType>
+        <EntityType Name="produto">
+          <Key>
+            <PropertyRef Name="sku" />
+          </Key>
+          <Property Name="sku" Type="Int32" Nullable="false" annotation:StoreGeneratedPattern="Identity" />
+          <Property Name="preco" Type="Decimal" Precision="7" Scale="2" Nullable="false" />
+          <Property Name="iva" Type="Decimal" Precision="6" Scale="5" Nullable="false" />
+          <Property Name="descricao" Type="String" MaxLength="256" FixedLength="false" Unicode="false" />
+          <NavigationProperty Name="items" Relationship="Self.FK__item__produto_sk__37A873D8" FromRole="produto" ToRole="item" />
+        </EntityType>
+        <Association Name="FK__change_lo__factu__516845DB">
+          <End Role="factura" Type="Self.factura" Multiplicity="0..1" />
+          <End Role="change_log" Type="Self.change_log" Multiplicity="*" />
+          <ReferentialConstraint>
+            <Principal Role="factura">
+              <PropertyRef Name="codigo" />
+            </Principal>
+            <Dependent Role="change_log">
+              <PropertyRef Name="factura_codigo" />
+            </Dependent>
+          </ReferentialConstraint>
+        </Association>
+        <Association Name="FK__factura_c__contr__30FB7649">
+          <End Role="contribuinte" Type="Self.contribuinte" Multiplicity="0..1" />
+          <End Role="factura_contribuinte" Type="Self.factura_contribuinte" Multiplicity="*" />
+          <ReferentialConstraint>
+            <Principal Role="contribuinte">
+              <PropertyRef Name="id" />
+            </Principal>
+            <Dependent Role="factura_contribuinte">
+              <PropertyRef Name="contribuinte_id" />
+            </Dependent>
+          </ReferentialConstraint>
+        </Association>
+        <Association Name="FK__devolucao__48D2FFDA">
+          <End Role="item" Type="Self.item" Multiplicity="1" />
+          <End Role="devolucao" Type="Self.devolucao" Multiplicity="*" />
+          <ReferentialConstraint>
+            <Principal Role="item">
+              <PropertyRef Name="numero" />
+              <PropertyRef Name="factura_codigo" />
+            </Principal>
+            <Dependent Role="devolucao">
+              <PropertyRef Name="item_numero" />
+              <PropertyRef Name="factura_codigo" />
+            </Dependent>
+          </ReferentialConstraint>
+        </Association>
+        <Association Name="FK__devolucao__49C72413">
+          <End Role="nota_credito" Type="Self.nota_credito" Multiplicity="1" />
+          <End Role="devolucao" Type="Self.devolucao" Multiplicity="*" />
+          <ReferentialConstraint>
+            <Principal Role="nota_credito">
+              <PropertyRef Name="codigo" />
+              <PropertyRef Name="factura_codigo" />
+            </Principal>
+            <Dependent Role="devolucao">
+              <PropertyRef Name="nota_credito_codigo" />
+              <PropertyRef Name="factura_codigo" />
+            </Dependent>
+          </ReferentialConstraint>
+        </Association>
+        <Association Name="FK__factura_c__factu__30075210">
+          <End Role="factura" Type="Self.factura" Multiplicity="1" />
+          <End Role="factura_contribuinte" Type="Self.factura_contribuinte" Multiplicity="0..1" />
+          <ReferentialConstraint>
+            <Principal Role="factura">
+              <PropertyRef Name="codigo" />
+            </Principal>
+            <Dependent Role="factura_contribuinte">
+              <PropertyRef Name="factura_codigo" />
+            </Dependent>
+          </ReferentialConstraint>
+        </Association>
+        <Association Name="FK__item__factura_co__389C9811">
+          <End Role="factura" Type="Self.factura" Multiplicity="1" />
+          <End Role="item" Type="Self.item" Multiplicity="*" />
+          <ReferentialConstraint>
+            <Principal Role="factura">
+              <PropertyRef Name="codigo" />
+            </Principal>
+            <Dependent Role="item">
+              <PropertyRef Name="factura_codigo" />
+            </Dependent>
+          </ReferentialConstraint>
+        </Association>
+        <Association Name="FK__nota_cred__factu__403DB9D9">
+          <End Role="factura" Type="Self.factura" Multiplicity="1" />
+          <End Role="nota_credito" Type="Self.nota_credito" Multiplicity="*" />
+          <ReferentialConstraint>
+            <Principal Role="factura">
+              <PropertyRef Name="codigo" />
+            </Principal>
+            <Dependent Role="nota_credito">
+              <PropertyRef Name="factura_codigo" />
+            </Dependent>
+          </ReferentialConstraint>
+        </Association>
+        <Association Name="FK__item__produto_sk__37A873D8">
+          <End Role="produto" Type="Self.produto" Multiplicity="0..1" />
+          <End Role="item" Type="Self.item" Multiplicity="*" />
+          <ReferentialConstraint>
+            <Principal Role="produto">
+              <PropertyRef Name="sku" />
+            </Principal>
+            <Dependent Role="item">
+              <PropertyRef Name="produto_sku" />
+            </Dependent>
+          </ReferentialConstraint>
+        </Association>
+        <EntityContainer Name="L5DG_30_connection" annotation:LazyLoadingEnabled="true">
+          <EntitySet Name="change_log" EntityType="Self.change_log" />
+          <EntitySet Name="contribuintes" EntityType="Self.contribuinte" />
+          <EntitySet Name="devolucaos" EntityType="Self.devolucao" />
+          <EntitySet Name="facturas" EntityType="Self.factura" />
+          <EntitySet Name="factura_contribuinte" EntityType="Self.factura_contribuinte" />
+          <EntitySet Name="items" EntityType="Self.item" />
+          <EntitySet Name="nota_credito" EntityType="Self.nota_credito" />
+          <EntitySet Name="produtoes" EntityType="Self.produto" />
+          <AssociationSet Name="FK__change_lo__factu__516845DB" Association="Self.FK__change_lo__factu__516845DB">
+            <End Role="factura" EntitySet="facturas" />
+            <End Role="change_log" EntitySet="change_log" />
+          </AssociationSet>
+          <AssociationSet Name="FK__factura_c__contr__30FB7649" Association="Self.FK__factura_c__contr__30FB7649">
+            <End Role="contribuinte" EntitySet="contribuintes" />
+            <End Role="factura_contribuinte" EntitySet="factura_contribuinte" />
+          </AssociationSet>
+          <AssociationSet Name="FK__devolucao__48D2FFDA" Association="Self.FK__devolucao__48D2FFDA">
+            <End Role="item" EntitySet="items" />
+            <End Role="devolucao" EntitySet="devolucaos" />
+          </AssociationSet>
+          <AssociationSet Name="FK__devolucao__49C72413" Association="Self.FK__devolucao__49C72413">
+            <End Role="nota_credito" EntitySet="nota_credito" />
+            <End Role="devolucao" EntitySet="devolucaos" />
+          </AssociationSet>
+          <AssociationSet Name="FK__factura_c__factu__30075210" Association="Self.FK__factura_c__factu__30075210">
+            <End Role="factura" EntitySet="facturas" />
+            <End Role="factura_contribuinte" EntitySet="factura_contribuinte" />
+          </AssociationSet>
+          <AssociationSet Name="FK__item__factura_co__389C9811" Association="Self.FK__item__factura_co__389C9811">
+            <End Role="factura" EntitySet="facturas" />
+            <End Role="item" EntitySet="items" />
+          </AssociationSet>
+          <AssociationSet Name="FK__nota_cred__factu__403DB9D9" Association="Self.FK__nota_cred__factu__403DB9D9">
+            <End Role="factura" EntitySet="facturas" />
+            <End Role="nota_credito" EntitySet="nota_credito" />
+          </AssociationSet>
+          <AssociationSet Name="FK__item__produto_sk__37A873D8" Association="Self.FK__item__produto_sk__37A873D8">
+            <End Role="produto" EntitySet="produtoes" />
+            <End Role="item" EntitySet="items" />
+          </AssociationSet>
+          <FunctionImport Name="f_listarNotasCredito" IsComposable="true" ReturnType="Collection(EFModel.f_listarNotasCredito_Result)">
+            <Parameter Name="ano" Mode="In" Type="Int32" />
+          </FunctionImport>
+          <FunctionImport Name="p_criaFactura">
+            <Parameter Name="contribuinte" Mode="In" Type="Decimal" />
+            <Parameter Name="nome" Mode="In" Type="String" />
+            <Parameter Name="morada" Mode="In" Type="String" />
+            <Parameter Name="codigo" Mode="InOut" Type="String" />
+          </FunctionImport>
+          <FunctionImport Name="p_criaNotaCredito">
+            <Parameter Name="factura_codigo" Mode="In" Type="String" />
+            <Parameter Name="codigo" Mode="InOut" Type="String" />
+          </FunctionImport>
+          <FunctionImport Name="p_facturaAnular">
+            <Parameter Name="codigo" Mode="In" Type="String" />
+          </FunctionImport>
+          <FunctionImport Name="p_facturaEmitir">
+            <Parameter Name="codigo" Mode="In" Type="String" />
+          </FunctionImport>
+          <FunctionImport Name="p_facturaProforma">
+            <Parameter Name="codigo" Mode="In" Type="String" />
+          </FunctionImport>
+          <FunctionImport Name="p_notaCreditoEmitir">
+            <Parameter Name="codigo" Mode="In" Type="String" />
+          </FunctionImport>
+          <FunctionImport Name="p_prox">
+            <Parameter Name="codigo_anterior" Mode="In" Type="String" />
+            <Parameter Name="codigo_novo" Mode="InOut" Type="String" />
+          </FunctionImport>
+          <FunctionImport Name="p_proxFactura">
+            <Parameter Name="codigo_novo" Mode="InOut" Type="String" />
+          </FunctionImport>
+          <FunctionImport Name="p_proxNotaCredito">
+            <Parameter Name="codigo_novo" Mode="InOut" Type="String" />
+          </FunctionImport>
+        </EntityContainer>
+      </Schema>
+    </edmx:ConceptualModels>
+    <!-- C-S mapping content -->
+    <edmx:Mappings>
+      <Mapping Space="C-S" xmlns="http://schemas.microsoft.com/ado/2009/11/mapping/cs">
+        <EntityContainerMapping StorageEntityContainer="EFModelStoreContainer" CdmEntityContainer="L5DG_30_connection">
+          <EntitySetMapping Name="change_log">
+            <EntityTypeMapping TypeName="EFModel.change_log">
+              <MappingFragment StoreEntitySet="change_log">
+                <ScalarProperty Name="id" ColumnName="id" />
+                <ScalarProperty Name="data_evento" ColumnName="data_evento" />
+                <ScalarProperty Name="evento" ColumnName="evento" />
+                <ScalarProperty Name="estado" ColumnName="estado" />
+                <ScalarProperty Name="ip" ColumnName="ip" />
+                <ScalarProperty Name="utilizador" ColumnName="utilizador" />
+                <ScalarProperty Name="factura_codigo" ColumnName="factura_codigo" />
+              </MappingFragment>
+            </EntityTypeMapping>
+          </EntitySetMapping>
+          <EntitySetMapping Name="contribuintes">
+            <EntityTypeMapping TypeName="EFModel.contribuinte">
+              <MappingFragment StoreEntitySet="contribuinte">
+                <ScalarProperty Name="id" ColumnName="id" />
+                <ScalarProperty Name="nome" ColumnName="nome" />
+                <ScalarProperty Name="morada" ColumnName="morada" />
+              </MappingFragment>
+            </EntityTypeMapping>
+          </EntitySetMapping>
+          <EntitySetMapping Name="devolucaos">
+            <EntityTypeMapping TypeName="EFModel.devolucao">
+              <MappingFragment StoreEntitySet="devolucao">
+                <ScalarProperty Name="quantidade" ColumnName="quantidade" />
+                <ScalarProperty Name="item_numero" ColumnName="item_numero" />
+                <ScalarProperty Name="factura_codigo" ColumnName="factura_codigo" />
+                <ScalarProperty Name="nota_credito_codigo" ColumnName="nota_credito_codigo" />
+              </MappingFragment>
+            </EntityTypeMapping>
+          </EntitySetMapping>
+          <EntitySetMapping Name="facturas">
+            <EntityTypeMapping TypeName="EFModel.factura">
+              <MappingFragment StoreEntitySet="factura">
+                <ScalarProperty Name="codigo" ColumnName="codigo" />
+                <ScalarProperty Name="estado" ColumnName="estado" />
+                <ScalarProperty Name="data_criacao" ColumnName="data_criacao" />
+                <ScalarProperty Name="data_complecao" ColumnName="data_complecao" />
+                <ScalarProperty Name="preco" ColumnName="preco" />
+                <ScalarProperty Name="iva" ColumnName="iva" />
+              </MappingFragment>
+            </EntityTypeMapping>
+          </EntitySetMapping>
+          <EntitySetMapping Name="factura_contribuinte">
+            <EntityTypeMapping TypeName="EFModel.factura_contribuinte">
+              <MappingFragment StoreEntitySet="factura_contribuinte">
+                <ScalarProperty Name="factura_codigo" ColumnName="factura_codigo" />
+                <ScalarProperty Name="contribuinte_id" ColumnName="contribuinte_id" />
+              </MappingFragment>
+            </EntityTypeMapping>
+          </EntitySetMapping>
+          <EntitySetMapping Name="items">
+            <EntityTypeMapping TypeName="EFModel.item">
+              <MappingFragment StoreEntitySet="item">
+                <ScalarProperty Name="numero" ColumnName="numero" />
+                <ScalarProperty Name="quantidade" ColumnName="quantidade" />
+                <ScalarProperty Name="desconto" ColumnName="desconto" />
+                <ScalarProperty Name="descricao" ColumnName="descricao" />
+                <ScalarProperty Name="produto_sku" ColumnName="produto_sku" />
+                <ScalarProperty Name="factura_codigo" ColumnName="factura_codigo" />
+              </MappingFragment>
+            </EntityTypeMapping>
+          </EntitySetMapping>
+          <EntitySetMapping Name="nota_credito">
+            <EntityTypeMapping TypeName="EFModel.nota_credito">
+              <MappingFragment StoreEntitySet="nota_credito">
+                <ScalarProperty Name="codigo" ColumnName="codigo" />
+                <ScalarProperty Name="estado" ColumnName="estado" />
+                <ScalarProperty Name="data_criacao" ColumnName="data_criacao" />
+                <ScalarProperty Name="data_complecao" ColumnName="data_complecao" />
+                <ScalarProperty Name="factura_codigo" ColumnName="factura_codigo" />
+                <ScalarProperty Name="preco" ColumnName="preco" />
+                <ScalarProperty Name="iva" ColumnName="iva" />
+              </MappingFragment>
+            </EntityTypeMapping>
+          </EntitySetMapping>
+          <EntitySetMapping Name="produtoes">
+            <EntityTypeMapping TypeName="EFModel.produto">
+              <MappingFragment StoreEntitySet="produto">
+                <ScalarProperty Name="sku" ColumnName="sku" />
+                <ScalarProperty Name="preco" ColumnName="preco" />
+                <ScalarProperty Name="iva" ColumnName="iva" />
+                <ScalarProperty Name="descricao" ColumnName="descricao" />
+              </MappingFragment>
+            </EntityTypeMapping>
+          </EntitySetMapping>
+          <FunctionImportMapping FunctionName="EFModel.Store.f_listarNotasCredito" FunctionImportName="f_listarNotasCredito">
+            <ResultMapping>
+              <ComplexTypeMapping TypeName="EFModel.f_listarNotasCredito_Result">
+                <ScalarProperty Name="NotaCredito" ColumnName="NotaCredito" />
+                <ScalarProperty Name="Factura" ColumnName="Factura" />
+                <ScalarProperty Name="Estado" ColumnName="Estado" />
+                <ScalarProperty Name="DataCriacao" ColumnName="DataCriacao" />
+                <ScalarProperty Name="DataComplecao" ColumnName="DataComplecao" />
+                <ScalarProperty Name="Preco" ColumnName="Preco" />
+                <ScalarProperty Name="IVA" ColumnName="IVA" />
+              </ComplexTypeMapping>
+            </ResultMapping>
+          </FunctionImportMapping>
+          <FunctionImportMapping FunctionImportName="p_criaFactura" FunctionName="EFModel.Store.p_criaFactura" />
+          <FunctionImportMapping FunctionImportName="p_criaNotaCredito" FunctionName="EFModel.Store.p_criaNotaCredito" />
+          <FunctionImportMapping FunctionImportName="p_facturaAnular" FunctionName="EFModel.Store.p_facturaAnular" />
+          <FunctionImportMapping FunctionImportName="p_facturaEmitir" FunctionName="EFModel.Store.p_facturaEmitir" />
+          <FunctionImportMapping FunctionImportName="p_facturaProforma" FunctionName="EFModel.Store.p_facturaProforma" />
+          <FunctionImportMapping FunctionImportName="p_notaCreditoEmitir" FunctionName="EFModel.Store.p_notaCreditoEmitir" />
+        </EntityContainerMapping>
+      </Mapping>
+    </edmx:Mappings>
+  </edmx:Runtime>
+  <!-- EF Designer content (DO NOT EDIT MANUALLY BELOW HERE) -->
+  <Designer xmlns="http://schemas.microsoft.com/ado/2009/11/edmx">
+    <Connection>
+      <DesignerInfoPropertySet>
+        <DesignerProperty Name="MetadataArtifactProcessing" Value="EmbedInOutputAssembly" />
+      </DesignerInfoPropertySet>
+    </Connection>
+    <Options>
+      <DesignerInfoPropertySet>
+        <DesignerProperty Name="ValidateOnBuild" Value="true" />
+        <DesignerProperty Name="EnablePluralization" Value="true" />
+        <DesignerProperty Name="IncludeForeignKeysInModel" Value="true" />
+        <DesignerProperty Name="UseLegacyProvider" Value="true" />
+        <DesignerProperty Name="CodeGenerationStrategy" Value="None" />
+      </DesignerInfoPropertySet>
+    </Options>
+    <!-- Diagram content (shape and connector positions) -->
+    <Diagrams></Diagrams>
+  </Designer>
+</edmx:Edmx>
